@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Mission</title>
+</head>
+<body>
+	<h1>Mission details</h1>
+	<div>
+		<p th:text=" ${'Destintion: ' + mission.destination}"></p>
+		<p th:text=" ${'Description: ' + mission.description}"></p>
+		<p th:text="${'Start Date: ' + mission.startDate}"></p>
+		<p th:text="${'Duration (in days): ' + mission.days}"></p>
+		<p th:text="${'Status: ' + mission.status}"></p>
+	</div>
+	
+	<div th:if="${mission.isOpen()}">
+		<form  action="#" th:action="@{/CreateExpensesReport}" method="POST">
+			<fieldset>
+				<p>Food expenses: <input type="number" step="0.0001" name="food" min=0 required/></p>
+				<p>Accomodation expenses: <input type="number" step="0.0001" name="accomodation" min=0 required/></p>
+				<p>Transportation expenses: <input type="number" step="0.0001" name="transportation" min=0 required/></p>
+				<input type="hidden" name="missionid" th:value="${mission.id}">
+				<input type="submit" name="Save Expenses">
+			</fieldset>
+		</form>
+	</div>
+
+	<div th:if="${mission.isClosed()}">
+	<!-- <div th:if="${mission.isClosed() || mission.isReported()}">  -->
+		<p>Expenses:</p>
+		<p th:text=" ${'Food: ' + expenses.food}"></p>
+		<p th:text=" ${'Accomodation: ' + expenses.accomodation}"></p>
+		<p th:text="${'Transportation: ' + expenses.transportation}"></p>
+	</div>
+		
+	<div th:if="${mission.isReported()}">
+		<form th:action="@{/CloseMission}" method="POST">
+			<input type="hidden" name="missionid" th:value="${mission.id}">
+			<button type="submit" name="action" value="Close">Close
+				mission</button>
+		</form>
+	</div>
+
+</body>
+</html>
