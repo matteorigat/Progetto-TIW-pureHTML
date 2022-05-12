@@ -19,7 +19,7 @@ public class ConferenceDAO {
     public List<Conference> findConferenceByUser(int userId) throws SQLException {
         List<Conference> conferences = new ArrayList<Conference>();
 
-        String query = "SELECT * from conferences where host = ? ORDER BY date DESC";
+        String query = "SELECT * FROM conferences WHERE host = ? AND date >= CURRENT_TIMESTAMP ORDER BY date";
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
             pstatement.setInt(1, userId);
             try (ResultSet result = pstatement.executeQuery();) {
@@ -41,7 +41,7 @@ public class ConferenceDAO {
     public List<Conference> findConference2ByUser(int userId) throws SQLException {
         List<Conference> conferences = new ArrayList<Conference>();
 
-        String query = "SELECT * from conferences where id in (SELECT idconference from guests where idguest = ?) ORDER BY date DESC";
+        String query = "SELECT * FROM conferences WHERE id IN (SELECT idconference FROM guests WHERE idguest = ?) AND date >= CURRENT_TIMESTAMP ORDER BY date";
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
             pstatement.setInt(1, userId);
             try (ResultSet result = pstatement.executeQuery();) {
@@ -92,7 +92,7 @@ public class ConferenceDAO {
     public void createConference(String title, Timestamp date, Time duration, int guests, int host)
             throws SQLException {
 
-        String query = "INSERT into conferences (host, title, date, duration, guests) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO conferences (host, title, date, duration, guests) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
             pstatement.setInt(1, host);
             pstatement.setString(2, title);

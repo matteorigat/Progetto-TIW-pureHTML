@@ -43,7 +43,7 @@ public class UserDAO {
 		String username = userBean.getUsername();
 		String password = userBean.getPassword();
 
-		String query = "insert into users(id,username,password,name,surname,email) values (NULL,?,?,?,?,?)"; //Insert user details into the table 'USERS'
+		String query = "INSERT INTO users(username,password,name,surname,email) VALUES (?,?,?,?,?)"; //Insert user details into the table 'USERS'
 		try(PreparedStatement pstatement = con.prepareStatement(query);){
 			pstatement.setString(1, username);
 			pstatement.setString(2, password);
