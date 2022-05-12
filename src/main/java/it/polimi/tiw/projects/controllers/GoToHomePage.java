@@ -14,14 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import it.polimi.tiw.projects.beans.Conference;
+import it.polimi.tiw.projects.dao.ConferenceDAO;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import it.polimi.tiw.projects.beans.Mission;
 import it.polimi.tiw.projects.beans.UserBean;
-import it.polimi.tiw.projects.dao.MissionsDAO;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 
 @WebServlet("/Home")
@@ -54,13 +54,15 @@ public class GoToHomePage extends HttpServlet {
 			return;
 		}
 		UserBean user = (UserBean) session.getAttribute("user");
-		MissionsDAO missionsDAO = new MissionsDAO(connection);
-		List<Mission> missions = new ArrayList<Mission>();
+		ConferenceDAO conferenceDAO = new ConferenceDAO(connection);
+		List<Conference> conferences = new ArrayList<Conference>();
+		List<Conference> conferences2 = new ArrayList<Conference>();
 
 		try {
-			missions = missionsDAO.findMissionsByUser(user.getId());
+			conferences = conferenceDAO.findConferenceByUser(user.getId());
+			conferences2 = conferenceDAO.findConference2ByUser(user.getId());
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover missions");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover conferences");
 			return;
 		}
 
@@ -68,7 +70,8 @@ public class GoToHomePage extends HttpServlet {
 		String path = "/WEB-INF/Home.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("missions", missions);
+		ctx.setVariable("conferences", conferences);
+		ctx.setVariable("conferences2", conferences2);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

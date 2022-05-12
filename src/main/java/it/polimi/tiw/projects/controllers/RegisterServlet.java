@@ -65,8 +65,10 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        if(!password.equals(password2))
+        if(!password.equals(password2)){
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Password and Confirm password are different");
             return;
+        }
 
         UserBean userBean = new UserBean();
         userBean.setName(name);
@@ -86,11 +88,7 @@ public class RegisterServlet extends HttpServlet {
         }
         else   //On Failure, display a meaningful message to the User.
         {
-            ServletContext servletContext = getServletContext();
-            final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-            ctx.setVariable("errorMsg", "Incorrect username or password");
-            path = "/signUp.html";
-            templateEngine.process(path, ctx, response.getWriter());
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error in creating an account");
         }
     }
 }

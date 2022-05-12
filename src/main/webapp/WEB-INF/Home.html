@@ -7,50 +7,78 @@
 	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
 </head>
 <body>
-	<div align="right">
-		<a th:href="@{/Logout}">Logout</a>
+	<div class="logout">
+		<a th:href="@{/Logout}"><button>Logout</button></a>
 	</div>
-	<h1>Welcome to the Mission Mamagement Home Page</h1>
-	<p th:text="${'Nice to see you again ' + session.user.name + ' ' + session.user.surname}"></p>
 
-	<table>
-		<thead>
-			<tr>
-				<th>Destination</th>
-				<th>Date</th>
-				<th>Link</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="m : ${missions}">
-				<td th:text="${m.destination}"></td>
-				<td th:text="${ m.startDate }"></td>
-				<td><a th:href="@{/GetMissionDetails(missionid=${m.id})}">Details</a></td>
-			</tr>
-		</tbody>
-	</table>
-
-	<div>
-		<p>Complete the form to create a mission</p>
-		<form action="#" th:action="@{/CreateMission}" method="POST">
+	<div class="conferenceForm">
+		<p>Complete the form to create a conference</p>
+		<form action="#" th:action="@{/CreateConference}" method="POST">
 			<fieldset>
 				<p>
-					Destination: <input type="text" name="destination" required />
+					Title: <input type="text" name="title" required />
 				</p>
 				<p>
-					Description: <input type="text" name="description" required />
+					Date: <input type="date" name="date" required />
 				</p>
 				<p>
-					Start Day: <input type="date" name="date"
-						th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
-						placeholder="yyyy-mm-dd" required />
+					Time: <input type="time" name="time" required />
 				</p>
 				<p>
-					Duration (in days): <input type="number" name="days" min=0 required />
+					Duration: <input type="time" name="duration" required/>
 				</p>
-				<input type="submit" name="Create Mission">
+				<p>
+					Guests: <input type="number" name="guests" min=0 required />
+				</p>
+				<input type="submit" name="Create Conference">
 			</fieldset>
 		</form>
 	</div>
+
+	<div class="rightside">
+		<h1>Welcome to the ConferenceApp Home Page</h1>
+		<h2 th:text="${'Nice to see you again ' + session.user.name + ' ' + session.user.surname}"></h2>
+		<br><br><br>
+		<p>Conferences created by you</p>
+		<table>
+			<thead>
+			<tr>
+				<th>Title</th>
+				<th>Date</th>
+				<th>Duration</th>
+				<th>Guests</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="c : ${conferences}">
+				<td th:text="${c.title}"></td>
+				<td th:text="${c.date}"></td>
+				<td th:text="${c.duration}"></td>
+				<td th:text="${c.guests}"></td>
+			</tr>
+			</tbody>
+		</table>
+        <br><br><br>
+		<p>Conferences where you are invited in</p>
+		<table>
+			<thead>
+			<tr>
+				<th>Title</th>
+				<th>Date</th>
+				<th>Duration</th>
+				<th>Guests</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="c : ${conferences2}">
+				<td th:text="${c.title}"></td>
+				<td th:text="${c.date}"></td>
+				<td th:text="${c.duration}"></td>
+				<td th:text="${c.guests}"></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+
 </body>
 </html>

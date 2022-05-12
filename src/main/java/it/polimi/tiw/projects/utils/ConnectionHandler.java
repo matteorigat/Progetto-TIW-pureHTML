@@ -36,7 +36,7 @@ public class ConnectionHandler {
 	public static Connection createConnection()
 	{
 		Connection con = null;
-		String url = "jdbc:mysql://localhost:3306/db_gestione_spese?serverTimezone=UTC"; //MySQL URL followed by the database name
+		String url = "jdbc:mysql://localhost:3306/Progetto-Tiw?serverTimezone=UTC"; //MySQL URL followed by the database name
 		String username = "root"; //MySQL username
 		String password = "password"; //MySQL password
 		System.out.println("In DBConnection.java class ");

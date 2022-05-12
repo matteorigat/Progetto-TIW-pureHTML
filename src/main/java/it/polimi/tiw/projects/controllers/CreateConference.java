@@ -3,6 +3,8 @@ package it.polimi.tiw.projects.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,19 +16,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import it.polimi.tiw.projects.beans.Conference;
+import it.polimi.tiw.projects.dao.ConferenceDAO;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import it.polimi.tiw.projects.beans.UserBean;
 import it.polimi.tiw.projects.dao.MissionsDAO;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 
-@WebServlet("/CreateMission")
-public class CreateMission extends HttpServlet {
+@WebServlet("/CreateConference")
+public class CreateConference extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private Connection connection = null;
 
-	public CreateMission() {
+	public CreateConference() {
 		super();
 	}
 
@@ -50,19 +54,21 @@ public class CreateMission extends HttpServlet {
 
 		// Get and parse all parameters from request
 		boolean isBadRequest = false;
-		Date startDate = null;
-		String destination = null;
-		String description = null;
-		Integer days = null;
+		String title = null;
+		Timestamp date = new Timestamp(0);
+		Time duration = null;
+		int guests = 0;
+
 		try {
-			days = Integer.parseInt(request.getParameter("days"));
-			destination = StringEscapeUtils.escapeJava(request.getParameter("destination"));
-			description = StringEscapeUtils.escapeJava(request.getParameter("description"));
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			startDate = (Date) sdf.parse(request.getParameter("date"));
-			isBadRequest = days <= 0 || destination.isEmpty() || description.isEmpty()
-					|| getMeYesterday().after(startDate);
-		} catch (NumberFormatException | NullPointerException | ParseException e) {
+			title = StringEscapeUtils.escapeJava(request.getParameter("title"));
+			date = Timestamp.valueOf(request.getParameter("date") + " " + request.getParameter("time") + ":00.000000000");
+			duration = Time.valueOf(request.getParameter("duration") + ":00");
+			guests = Integer.parseInt(request.getParameter("guests"));
+
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+
+			isBadRequest = title.isEmpty() || date.before(now) || guests <= 0;
+		} catch (NumberFormatException | NullPointerException e) {
 			isBadRequest = true;
 			e.printStackTrace();
 		}
@@ -71,19 +77,18 @@ public class CreateMission extends HttpServlet {
 			return;
 		}
 
-		// Create mission in DB
+		// Create conference in DB
 		UserBean user = (UserBean) session.getAttribute("user");
-		MissionsDAO missionsDAO = new MissionsDAO(connection);
+		ConferenceDAO conferenceDAO = new ConferenceDAO(connection);
 		try {
-			missionsDAO.createMission(startDate, days, destination, description, user.getId());
+			conferenceDAO.createConference(title, date, duration, guests, user.getId());
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to create mission");
 			return;
 		}
 
 		// return the user to the right view
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Home";
+		String path = getServletContext().getContextPath() + "/anagrafica.html";
 		response.sendRedirect(path);
 	}
 
