@@ -2,12 +2,9 @@ package it.polimi.tiw.projects.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import it.polimi.tiw.projects.beans.Conference;
-import it.polimi.tiw.projects.beans.Mission;
-import it.polimi.tiw.projects.beans.MissionStatus;
 
 public class ConferenceDAO {
     private Connection connection;
@@ -80,14 +77,6 @@ public class ConferenceDAO {
         return conference;
     }
 
-    public void changeMissionStatus(int missionId, MissionStatus missionStatus) throws SQLException {
-        String query = "UPDATE mission SET status = ? WHERE id = ? ";
-        try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-            pstatement.setInt(1, missionStatus.getValue());
-            pstatement.setInt(2, missionId);
-            pstatement.executeUpdate();
-        }
-    }
 
     public void createConference(String title, Timestamp date, Time duration, int guests, int host)
             throws SQLException {

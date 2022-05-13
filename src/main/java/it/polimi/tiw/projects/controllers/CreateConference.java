@@ -5,8 +5,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -16,12 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import it.polimi.tiw.projects.beans.Conference;
 import it.polimi.tiw.projects.dao.ConferenceDAO;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import it.polimi.tiw.projects.beans.UserBean;
-import it.polimi.tiw.projects.dao.MissionsDAO;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 
 @WebServlet("/CreateConference")
@@ -88,7 +84,8 @@ public class CreateConference extends HttpServlet {
 		}
 
 		// return the user to the right view
-		String path = getServletContext().getContextPath() + "/anagrafica.html";
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/Anagrafica";
 		response.sendRedirect(path);
 	}
 

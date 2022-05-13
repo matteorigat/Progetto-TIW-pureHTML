@@ -3,6 +3,7 @@ package it.polimi.tiw.projects.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -12,25 +13,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import it.polimi.tiw.projects.dao.UserDAO;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import it.polimi.tiw.projects.beans.ExpenseReport;
-import it.polimi.tiw.projects.beans.Mission;
 import it.polimi.tiw.projects.beans.UserBean;
-import it.polimi.tiw.projects.dao.ExpenseReportDAO;
-import it.polimi.tiw.projects.dao.MissionsDAO;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 
-@WebServlet("/GetMissionDetails")
-public class GetMissionDetails extends HttpServlet {
+@WebServlet("/Anagrafica")
+public class GetConferenceUsers extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public GetMissionDetails() {
+	public GetConferenceUsers() {
 		super();
 	}
 
@@ -57,33 +55,30 @@ public class GetMissionDetails extends HttpServlet {
 		}
 
 		// get and check params
-		Integer missionId = null;
+		/*
+		Integer conferenceId = null;
 		try {
-			missionId = Integer.parseInt(request.getParameter("missionid"));
+			conferenceId = Integer.parseInt(request.getParameter("conferenceid"));
 		} catch (NumberFormatException | NullPointerException e) {
 			// only for debugging e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
+		*/
 
 		// If a mission with that ID exists for that USER,
 		// obtain the expense report for it
 		UserBean user = (UserBean) session.getAttribute("user");
-		MissionsDAO missionsDAO = new MissionsDAO(connection);
-		ExpenseReport expenses = new ExpenseReport();
-		Mission mission = null;
+		ArrayList<UserBean> users = null;
+
+		UserDAO userDAO = new UserDAO(connection);
 		try {
-			mission = missionsDAO.findMissionById(missionId);
-			if (mission == null) {
+			users = userDAO.getUsers(user.getId());
+			if (users == null) {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
 				return;
 			}
-			if (mission.getReporterId() != user.getId()) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not allowed");
-				return;
-			}
-			ExpenseReportDAO expenseReportDAO = new ExpenseReportDAO(connection);
-			expenses = expenseReportDAO.findExpensesForMission(missionId);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			//response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover mission");
@@ -91,11 +86,10 @@ public class GetMissionDetails extends HttpServlet {
 		}
 
 		// Redirect to the Home page and add missions to the parameters
-		String path = "/WEB-INF/MissionDetails.html";
+		String path = "/WEB-INF/Anagrafica.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("mission", mission);
-		ctx.setVariable("expenses", expenses);
+		ctx.setVariable("users", users);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

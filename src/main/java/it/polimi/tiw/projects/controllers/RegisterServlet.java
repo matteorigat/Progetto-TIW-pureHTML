@@ -2,7 +2,6 @@ package it.polimi.tiw.projects.controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +14,6 @@ import it.polimi.tiw.projects.dao.UserDAO;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 

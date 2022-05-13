@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import it.polimi.tiw.projects.beans.UserBean;
-import it.polimi.tiw.projects.utils.ConnectionHandler;
 
 public class UserDAO {
 	private Connection con;
@@ -16,7 +16,7 @@ public class UserDAO {
 	}
 
 	public UserBean checkCredentials(String usrn, String pwd) throws SQLException {
-		String query = "SELECT  id, username, name, surname FROM users  WHERE username = ? AND password = ?";
+		String query = "SELECT id, username, name, surname FROM users  WHERE username = ? AND password = ?";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, usrn);
 			pstatement.setString(2, pwd);
@@ -61,5 +61,25 @@ public class UserDAO {
 			e.printStackTrace();
 		}
 		return "Oops.. Something went wrong there..!";  // On failure, send a message from here.
+	}
+
+
+	public ArrayList<UserBean> getUsers(int userId) throws SQLException {
+		ArrayList<UserBean> users = new ArrayList<>();
+
+		String query = "SELECT * FROM users WHERE id <> ?";
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setInt(1, userId);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					UserBean user = new UserBean();
+					user.setId(result.getInt("id"));
+					user.setName(result.getString("name"));
+					user.setSurname(result.getString("surname"));
+					users.add(user);
+				}
+			}
+		}
+		return users;
 	}
 }
