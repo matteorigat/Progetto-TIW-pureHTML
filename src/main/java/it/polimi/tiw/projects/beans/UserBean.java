@@ -12,6 +12,8 @@ public class UserBean {
 
 	private String password;
 
+	private Boolean checked = false;
+
 	public int getId() {
 		return id;
 	}
@@ -58,5 +60,13 @@ public class UserBean {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Boolean getChecked() {
+		return checked;
+	}
+
+	public void setChecked(Boolean checked) {
+		this.checked = checked;
 	}
 }

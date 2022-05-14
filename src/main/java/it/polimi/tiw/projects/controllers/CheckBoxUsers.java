@@ -3,6 +3,7 @@ package it.polimi.tiw.projects.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import it.polimi.tiw.projects.beans.Conference;
 import it.polimi.tiw.projects.dao.ConferenceDAO;
 import it.polimi.tiw.projects.dao.GuestDAO;
+import it.polimi.tiw.projects.dao.UserDAO;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -79,13 +81,6 @@ public class CheckBoxUsers extends HttpServlet {
 			return;
 		}
 
-		if(attempt >= 2){
-			// Redirect to the Home page and add missions to the parameters
-			String path = "/WEB-INF/Home.html";
-			ServletContext servletContext = getServletContext();
-			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-			templateEngine.process(path, ctx, response.getWriter());
-		}
 
 		String[] checkBoxArray = new String[0];
 		Boolean isBadRequest = false;
@@ -102,9 +97,6 @@ public class CheckBoxUsers extends HttpServlet {
 			return;
 		}
 
-		for (int i=0; i < checkBoxArray.length; i++)
-			System.out.println(checkBoxArray[i]);
-
 		if(conference.getGuests() >= checkBoxArray.length) {
 			GuestDAO guestDAO = new GuestDAO(connection);
 
@@ -113,15 +105,52 @@ public class CheckBoxUsers extends HttpServlet {
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
-		} else {
-			String path = getServletContext().getContextPath() + "/Anagrafica";
+
+			// Redirect to the Home page and add missions to the parameters
+			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
+
+		} else {
+			ArrayList<UserBean> users = null;
+			UserDAO userDAO = new UserDAO(connection);
+			try {
+				users = userDAO.getUsers(user.getId());
+				if (users == null) {
+					response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+					return;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover users");
+				return;
+			}
+
+			for(int i=0; i<checkBoxArray.length; i++)
+			   for(UserBean ub: users)
+				   if(Integer.parseInt(checkBoxArray[i]) == ub.getId())
+					   ub.setChecked(true);
+
+			if(attempt >= 2){
+				try {
+					conferenceDAO.deleteConferenceById(conference.getId());
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}
+				// Redirect to the Home page and add missions to the parameters
+				String path = getServletContext().getContextPath() + "/Home";
+				response.sendRedirect(path);
+			} else {
+				// Redirect to the Home page and add missions to the parameters
+				String path = "/WEB-INF/Anagrafica.html";
+				ServletContext servletContext = getServletContext();
+				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+				ctx.setVariable("users", users);
+				ctx.setVariable("attempt", 2 - attempt);
+
+				templateEngine.process(path, ctx, response.getWriter());
+			}
+
 		}
-
-
-		// Redirect to the Home page and add missions to the parameters
-		String path = getServletContext().getContextPath() + "/Home";
-		response.sendRedirect(path);
 
 	}
 

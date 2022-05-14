@@ -2,12 +2,15 @@ package it.polimi.tiw.projects.controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.validator.routines.EmailValidator;
 
 import it.polimi.tiw.projects.beans.UserBean;
 import it.polimi.tiw.projects.dao.UserDAO;
@@ -45,6 +48,7 @@ public class RegisterServlet extends HttpServlet {
         String username;
         String password;
         String password2;
+
         try {
             name = StringEscapeUtils.escapeJava(request.getParameter("name"));
             surname = StringEscapeUtils.escapeJava(request.getParameter("surname"));
@@ -52,6 +56,11 @@ public class RegisterServlet extends HttpServlet {
             username = StringEscapeUtils.escapeJava(request.getParameter("username"));
             password = StringEscapeUtils.escapeJava(request.getParameter("password"));
             password2 = StringEscapeUtils.escapeJava(request.getParameter("password2"));
+
+            boolean validEmail = EmailValidator.getInstance().isValid(email);
+
+            if(!validEmail)
+                throw new Exception("Email not valid");
 
             if (name == null || surname == null || email == null || username == null || password == null || password2 == null || name.isEmpty() || surname.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty() || password2.isEmpty()){
                 throw new Exception("Missing or empty credential value");
@@ -61,6 +70,18 @@ public class RegisterServlet extends HttpServlet {
             // for debugging only e.printStackTrace();
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing credential value");
             return;
+        }
+
+        UserDAO userDao = new UserDAO(connection);
+
+        try {
+            if(userDao.checkUsername(username)){
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username duplicate");
+                return;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         if(!password.equals(password2)){
@@ -75,12 +96,9 @@ public class RegisterServlet extends HttpServlet {
         userBean.setUsername(username);
         userBean.setPassword(password);
 
-        UserDAO userDao = new UserDAO(connection);
-
         //The core Logic of the Registration application is present here. We are going to insert user data in to the database.
         String userRegistered = userDao.registerUser(userBean);
 
-        String path;
         if(userRegistered.equals("SUCCESS")){   //On success, you can display a message to user on Home page
             request.getRequestDispatcher("/index.html").forward(request, response);
         }

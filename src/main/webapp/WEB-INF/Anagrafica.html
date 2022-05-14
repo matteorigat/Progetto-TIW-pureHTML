@@ -9,6 +9,7 @@
 <body>
     <center>
 		<h1>Welcome to anagrafica</h1>
+		<h3 th:if="${attempt > 0}" th:text="${'Error! select fewer users. you still have ' + attempt + ' attempts'}"></h3>
 
 		<form action="#" th:action="@{/CheckBoxUsers}" method="POST">
 		<table>
@@ -21,13 +22,15 @@
 			</thead>
 			<tbody>
 				<tr th:each="u : ${users}">
-					<td><input type="checkbox" th:name="userscheckbox" th:value="${u.id}"></td>
+					<td th:if="${u.checked}"><input type="checkbox" th:name="userscheckbox" th:value="${u.id}" checked></td>
+					<td th:unless="${u.checked}"><input type="checkbox" th:name="userscheckbox" th:value="${u.id}"></td>
 					<td th:text="${u.name}"></td>
 					<td th:text="${u.surname}"></td>
 				</tr>
 			</tbody>
 		</table>
-			<input type="submit" name="Create Conference">
+			<br>
+			<input class="inputbutton" type="submit" name="Create Conference">
 		</form>
   <!--
 		<fieldset>

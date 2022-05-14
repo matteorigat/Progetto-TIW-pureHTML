@@ -41,16 +41,17 @@ public class Conference {
         this.title = title;
     }
 
-    public Timestamp getDate() {
-        return date;
+    public String getStringDate() {
+        String[] s = date.toLocaleString().split(", ");
+        return s[0] + " " + s[1].substring(0,5);
     }
 
     public void setDate(Timestamp date) {
         this.date = date;
     }
 
-    public Time getDuration() {
-        return duration;
+    public String getStringDuration() {
+        return duration.toString().substring(0,5);
     }
 
     public void setDuration(Time duration) {

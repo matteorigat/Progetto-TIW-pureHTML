@@ -77,24 +77,12 @@ public class ConferenceDAO {
         return conference;
     }
 
-    public Conference findConferenceById(int conferenceId) throws SQLException {
-        Conference conference = null;
-        String query = "SELECT * FROM conferences WHERE id = ?";
+    public void deleteConferenceById(int conferenceId) throws SQLException {
+        String query = "DELETE FROM conferences WHERE id = ?";
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
             pstatement.setInt(1, conferenceId);
-            try (ResultSet result = pstatement.executeQuery();) {
-                if (result.next()) {
-                    conference = new Conference();
-                    conference.setId(result.getInt("id"));
-                    conference.setHostId(result.getInt("host"));
-                    conference.setTitle(result.getString("title"));
-                    conference.setDate(result.getTimestamp("date"));
-                    conference.setDuration(result.getTime("duration"));
-                    conference.setGuests(result.getInt("guests"));
-                }
-            }
+            pstatement.executeUpdate();
         }
-        return conference;
     }
 
 

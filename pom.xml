@@ -35,6 +35,11 @@
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
+      <dependency>
+          <groupId>commons-validator</groupId>
+          <artifactId>commons-validator</artifactId>
+          <version>1.7</version>
+      </dependency>
   </dependencies>
   <build>
     <finalName>Progetto-TIW</finalName>

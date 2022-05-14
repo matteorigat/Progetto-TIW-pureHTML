@@ -30,7 +30,7 @@
 				<p>
 					Guests: <input type="number" name="guests" min=0 required />
 				</p>
-				<input type="submit" name="Create Conference">
+				<input class="inputbutton" type="submit" name="Create Conference">
 			</fieldset>
 		</form>
 	</div>
@@ -52,8 +52,8 @@
 			<tbody>
 			<tr th:each="c : ${conferences}">
 				<td th:text="${c.title}"></td>
-				<td th:text="${c.date}"></td>
-				<td th:text="${c.duration}"></td>
+				<td th:text="${c.getStringDate()}"></td>
+				<td th:text="${c.getStringDuration()}"></td>
 				<td th:text="${c.guests}"></td>
 			</tr>
 			</tbody>
@@ -72,8 +72,8 @@
 			<tbody>
 			<tr th:each="c : ${conferences2}">
 				<td th:text="${c.title}"></td>
-				<td th:text="${c.date}"></td>
-				<td th:text="${c.duration}"></td>
+				<td th:text="${c.getStringDate()}"></td>
+				<td th:text="${c.getStringDuration()}"></td>
 				<td th:text="${c.guests}"></td>
 			</tr>
 			</tbody>
