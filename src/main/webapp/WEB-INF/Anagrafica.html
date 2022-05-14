@@ -10,6 +10,7 @@
     <center>
 		<h1>Welcome to anagrafica</h1>
 
+		<form action="#" th:action="@{/CheckBoxUsers}" method="POST">
 		<table>
 			<thead>
 			<tr>
@@ -19,16 +20,15 @@
 			</tr>
 			</thead>
 			<tbody>
-			<form action="#" th:action="@{/AddGuests}" method="POST">
 				<tr th:each="u : ${users}">
-					<td><input type="checkbox" th:name="${u.id}"></td>
+					<td><input type="checkbox" th:name="userscheckbox" th:value="${u.id}"></td>
 					<td th:text="${u.name}"></td>
 					<td th:text="${u.surname}"></td>
 				</tr>
-				<input type="submit" name="Create Conference">
-			</form>
 			</tbody>
 		</table>
+			<input type="submit" name="Create Conference">
+		</form>
   <!--
 		<fieldset>
 			<legend>Choose users:</legend>

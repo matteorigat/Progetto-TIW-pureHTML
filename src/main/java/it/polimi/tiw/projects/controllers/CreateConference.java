@@ -5,8 +5,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,23 +16,36 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import it.polimi.tiw.projects.beans.Conference;
 import it.polimi.tiw.projects.dao.ConferenceDAO;
+import it.polimi.tiw.projects.dao.UserDAO;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import it.polimi.tiw.projects.beans.UserBean;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 @WebServlet("/CreateConference")
 public class CreateConference extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
 	private Connection connection = null;
+	private TemplateEngine templateEngine;
 
 	public CreateConference() {
 		super();
 	}
 
 	public void init() throws ServletException {
+		ServletContext servletContext = getServletContext();
+		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
+		templateResolver.setTemplateMode(TemplateMode.HTML);
+		this.templateEngine = new TemplateEngine();
+		this.templateEngine.setTemplateResolver(templateResolver);
+		templateResolver.setSuffix(".html");
+
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
@@ -79,14 +94,32 @@ public class CreateConference extends HttpServlet {
 		try {
 			conferenceDAO.createConference(title, date, duration, guests, user.getId());
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to create mission");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to create conference");
 			return;
 		}
 
-		// return the user to the right view
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Anagrafica";
-		response.sendRedirect(path);
+		ArrayList<UserBean> users = null;
+		UserDAO userDAO = new UserDAO(connection);
+		try {
+			users = userDAO.getUsers(user.getId());
+			if (users == null) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+				return;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover users");
+			return;
+		}
+
+
+		// Redirect to the Home page and add missions to the parameters
+		String path = "/WEB-INF/Anagrafica.html";
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("users", users);
+		templateEngine.process(path, ctx, response.getWriter());
+
 	}
 
 	public void destroy() {

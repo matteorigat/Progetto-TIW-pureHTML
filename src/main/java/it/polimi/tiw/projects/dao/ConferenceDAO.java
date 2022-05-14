@@ -57,6 +57,26 @@ public class ConferenceDAO {
         return conferences;
     }
 
+    public Conference findLastConferenceByUser(int userId) throws SQLException {
+        Conference conference = new Conference();
+
+        String query = "SELECT * FROM conferences WHERE host = ? ORDER BY id DESC";
+        try (PreparedStatement pstatement = connection.prepareStatement(query);) {
+            pstatement.setInt(1, userId);
+            try (ResultSet result = pstatement.executeQuery();) {
+                if (result.next()) {
+                    conference.setId(result.getInt("id"));
+                    conference.setTitle(result.getString("title"));
+                    conference.setDate(result.getTimestamp("date"));
+                    conference.setDuration(result.getTime("duration"));
+                    conference.setGuests(result.getInt("guests"));
+                    conference.setHostId(result.getInt("host"));
+                }
+            }
+        }
+        return conference;
+    }
+
     public Conference findConferenceById(int conferenceId) throws SQLException {
         Conference conference = null;
         String query = "SELECT * FROM conferences WHERE id = ?";
