@@ -57,24 +57,19 @@ public class ConferenceDAO {
         return conferences;
     }
 
-    public Conference findLastConferenceByUser(int userId) throws SQLException {
-        Conference conference = new Conference();
+    public int findLastConferenceByUser(int userId) throws SQLException {
+        int conferenceId = 0;
 
         String query = "SELECT * FROM conferences WHERE host = ? ORDER BY id DESC";
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
             pstatement.setInt(1, userId);
             try (ResultSet result = pstatement.executeQuery();) {
                 if (result.next()) {
-                    conference.setId(result.getInt("id"));
-                    conference.setTitle(result.getString("title"));
-                    conference.setDate(result.getTimestamp("date"));
-                    conference.setDuration(result.getTime("duration"));
-                    conference.setGuests(result.getInt("guests"));
-                    conference.setHostId(result.getInt("host"));
+                    conferenceId = result.getInt("id");
                 }
             }
         }
-        return conference;
+        return conferenceId;
     }
 
     public void deleteConferenceById(int conferenceId) throws SQLException {
@@ -86,16 +81,16 @@ public class ConferenceDAO {
     }
 
 
-    public void createConference(String title, Timestamp date, Time duration, int guests, int host)
+    public void createConference(Conference conference)
             throws SQLException {
 
         String query = "INSERT INTO conferences (host, title, date, duration, guests) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-            pstatement.setInt(1, host);
-            pstatement.setString(2, title);
-            pstatement.setTimestamp(3, date);
-            pstatement.setTime(4, duration);
-            pstatement.setInt(5, guests);
+            pstatement.setInt(1, conference.getHostId());
+            pstatement.setString(2, conference.getTitle());
+            pstatement.setTimestamp(3, conference.getDate());
+            pstatement.setTime(4, conference.getDuration());
+            pstatement.setInt(5, conference.getGuests());
             pstatement.executeUpdate();
         }
     }

@@ -88,15 +88,16 @@ public class CreateConference extends HttpServlet {
 			return;
 		}
 
-		// Create conference in DB
 		UserBean user = (UserBean) session.getAttribute("user");
-		ConferenceDAO conferenceDAO = new ConferenceDAO(connection);
-		try {
-			conferenceDAO.createConference(title, date, duration, guests, user.getId());
-		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to create conference");
-			return;
-		}
+
+		Conference conference = new Conference();
+		conference.setHostId(user.getId());
+		conference.setTitle(title);
+		conference.setDate(date);
+		conference.setDuration(duration);
+		conference.setGuests(guests);
+		request.getSession().setAttribute("conference", conference);
+
 
 		ArrayList<UserBean> users = null;
 		UserDAO userDAO = new UserDAO(connection);
@@ -112,9 +113,8 @@ public class CreateConference extends HttpServlet {
 			return;
 		}
 
-
 		// Redirect to the Home page and add missions to the parameters
-		String path = "/WEB-INF/Anagrafica.html";
+		String path = "/WEB-INF/Anagrafica";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("users", users);

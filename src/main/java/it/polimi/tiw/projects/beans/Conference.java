@@ -46,6 +46,14 @@ public class Conference {
         return s[0] + " " + s[1].substring(0,5);
     }
 
+    public Timestamp getDate() {
+        return date;
+    }
+
+    public Time getDuration() {
+        return duration;
+    }
+
     public void setDate(Timestamp date) {
         this.date = date;
     }

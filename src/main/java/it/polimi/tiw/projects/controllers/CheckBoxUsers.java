@@ -60,27 +60,11 @@ public class CheckBoxUsers extends HttpServlet {
 			return;
 		}
 
-
-		UserBean user = (UserBean) session.getAttribute("user");
-		ConferenceDAO conferenceDAO = new ConferenceDAO(connection);
-		Conference conference = null;
-		try {
-			conference = conferenceDAO.findLastConferenceByUser(user.getId());
-			if (conference == null) {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
-				return;
-			} else if(conference.getId() == this.conf.getId()){
-				attempt++;
-			} else{
-				attempt = 0;
-				setConference(conference);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover conference");
+		Conference conference = (Conference) request.getSession().getAttribute("conference");
+		if (conference == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
 			return;
 		}
-
 
 		String[] checkBoxArray = new String[0];
 		Boolean isBadRequest = false;
@@ -99,20 +83,26 @@ public class CheckBoxUsers extends HttpServlet {
 
 		if(conference.getGuests() >= checkBoxArray.length) {
 			GuestDAO guestDAO = new GuestDAO(connection);
-
+			ConferenceDAO conferenceDAO = new ConferenceDAO(connection);
 			try {
-				guestDAO.registerGuests(checkBoxArray, conference.getId());
+				conferenceDAO.createConference(conference);
+				int conferenceId = conferenceDAO.findLastConferenceByUser(conference.getHostId());
+				guestDAO.registerGuests(checkBoxArray, conferenceId);
+
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 
 			// Redirect to the Home page and add missions to the parameters
+			attempt = 0;
+			request.getSession().removeAttribute("conference");
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 
 		} else {
-			ArrayList<UserBean> users = null;
+			ArrayList<UserBean> users;
 			UserDAO userDAO = new UserDAO(connection);
+			UserBean user = (UserBean) session.getAttribute("user");
 			try {
 				users = userDAO.getUsers(user.getId());
 				if (users == null) {
@@ -131,21 +121,19 @@ public class CheckBoxUsers extends HttpServlet {
 					   ub.setChecked(true);
 
 			if(attempt >= 2){
-				try {
-					conferenceDAO.deleteConferenceById(conference.getId());
-				} catch (SQLException e) {
-					throw new RuntimeException(e);
-				}
 				// Redirect to the Home page and add missions to the parameters
+				attempt = 0;
+				request.getSession().removeAttribute("conference");
 				String path = getServletContext().getContextPath() + "/Home";
 				response.sendRedirect(path);
 			} else {
 				// Redirect to the Home page and add missions to the parameters
+				attempt++;
 				String path = "/WEB-INF/Anagrafica.html";
 				ServletContext servletContext = getServletContext();
 				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 				ctx.setVariable("users", users);
-				ctx.setVariable("attempt", 2 - attempt);
+				ctx.setVariable("attempt", 3 - attempt);
 
 				templateEngine.process(path, ctx, response.getWriter());
 			}
