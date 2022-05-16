@@ -9,7 +9,8 @@
 <body>
     <center>
 		<h1>Welcome to anagrafica</h1>
-		<h3 th:if="${attempt > 0}" th:text="${'Error! Too many selected users, delete at least ' + surplusGuests + '... you still have ' + attempt + ' attempts'}"></h3>
+		<h3 th:if="${attempt > 0}" th:text="${'Error! Too many selected users, delete at least ' + surplusGuests}"></h3>
+		<h3 th:if="${attempt > 0}" th:text="${'You still have ' + attempt + ' attempts'}"></h3>
 
 		<form action="#" th:action="@{/CheckBoxUsers}" method="POST">
 		<table>
