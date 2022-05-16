@@ -31,7 +31,6 @@ public class CheckBoxUsers extends HttpServlet {
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	private Conference conf = new Conference();
 	private int attempt = 0;
 
 	public CheckBoxUsers() {
@@ -66,7 +65,7 @@ public class CheckBoxUsers extends HttpServlet {
 			return;
 		}
 
-		String[] checkBoxArray = new String[0];
+		String[] checkBoxArray = null;
 		Boolean isBadRequest = false;
 		try {
 			checkBoxArray = request.getParameterValues("userscheckbox");
@@ -100,25 +99,6 @@ public class CheckBoxUsers extends HttpServlet {
 			response.sendRedirect(path);
 
 		} else {
-			ArrayList<UserBean> users;
-			UserDAO userDAO = new UserDAO(connection);
-			UserBean user = (UserBean) session.getAttribute("user");
-			try {
-				users = userDAO.getUsers(user.getId());
-				if (users == null) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
-					return;
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover users");
-				return;
-			}
-
-			for(int i=0; i<checkBoxArray.length; i++)
-			   for(UserBean ub: users)
-				   if(Integer.parseInt(checkBoxArray[i]) == ub.getId())
-					   ub.setChecked(true);
 
 			if(attempt >= 2){
 				// Redirect to the Home page and add missions to the parameters
@@ -127,6 +107,27 @@ public class CheckBoxUsers extends HttpServlet {
 				String path = getServletContext().getContextPath() + "/Home";
 				response.sendRedirect(path);
 			} else {
+
+				ArrayList<UserBean> users;
+				UserDAO userDAO = new UserDAO(connection);
+				UserBean user = (UserBean) session.getAttribute("user");
+				try {
+					users = userDAO.getUsers(user.getId());
+					if (users == null) {
+						response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+						return;
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover users");
+					return;
+				}
+
+				for(int i=0; i<checkBoxArray.length; i++)
+					for(UserBean ub: users)
+						if(Integer.parseInt(checkBoxArray[i]) == ub.getId())
+							ub.setChecked(true);
+
 				// Redirect to the Home page and add missions to the parameters
 				attempt++;
 				String path = "/WEB-INF/Anagrafica.html";
@@ -137,9 +138,7 @@ public class CheckBoxUsers extends HttpServlet {
 
 				templateEngine.process(path, ctx, response.getWriter());
 			}
-
 		}
-
 	}
 
 	public void destroy() {
@@ -148,9 +147,5 @@ public class CheckBoxUsers extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void setConference(Conference conference) {
-		this.conf = conference;
 	}
 }
