@@ -36,7 +36,7 @@ public class UserDAO {
 		}
 	}
 
-	public Boolean checkUsername(String usrn) throws SQLException {
+	public Boolean checkUsername(String usrn) throws SQLException { // passo l'username e controllo se è l'unico nel database
 		String query = "SELECT * FROM users WHERE username = ?";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, usrn);

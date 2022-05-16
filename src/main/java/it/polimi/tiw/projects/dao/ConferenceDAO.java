@@ -8,7 +8,6 @@ import it.polimi.tiw.projects.beans.Conference;
 
 public class ConferenceDAO {
     private Connection connection;
-
     public ConferenceDAO(Connection connection) {
         this.connection = connection;
     }
@@ -60,7 +59,7 @@ public class ConferenceDAO {
     public int findLastConferenceByUser(int userId) throws SQLException {
         int conferenceId = 0;
 
-        String query = "SELECT * FROM conferences WHERE host = ? ORDER BY id DESC";
+        String query = "SELECT * FROM conferences WHERE host = ? ORDER BY id DESC"; // ordina le conference per id decrescente (quindi in ordine di creazione dall'ultima alla prima)
         try (PreparedStatement pstatement = connection.prepareStatement(query);) {
             pstatement.setInt(1, userId);
             try (ResultSet result = pstatement.executeQuery();) {

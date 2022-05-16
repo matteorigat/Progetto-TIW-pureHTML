@@ -57,7 +57,7 @@ public class RegisterServlet extends HttpServlet {
             password = StringEscapeUtils.escapeJava(request.getParameter("password"));
             password2 = StringEscapeUtils.escapeJava(request.getParameter("password2"));
 
-            boolean validEmail = EmailValidator.getInstance().isValid(email);
+            boolean validEmail = EmailValidator.getInstance().isValid(email); // controllo veridicità sintattica dell'email
 
             if(!validEmail)
                 throw new Exception("Email not valid");

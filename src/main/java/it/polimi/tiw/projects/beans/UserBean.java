@@ -12,7 +12,7 @@ public class UserBean {
 
 	private String password;
 
-	private Boolean checked = false;
+	private Boolean checked = false; // quando creo una conference e seleziono più utenti del dovuto la pagina di creazione conferenza si riaggiorna dandomi errore ma gli utenti che avevo selezionato rimangono selezionati perchè checked
 
 	public int getId() {
 		return id;

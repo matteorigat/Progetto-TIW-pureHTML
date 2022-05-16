@@ -104,8 +104,11 @@ public class CheckBoxUsers extends HttpServlet {
 				// Redirect to the Home page and add missions to the parameters
 				attempt = 0;
 				request.getSession().removeAttribute("conference");
-				String path = getServletContext().getContextPath() + "/Home";
-				response.sendRedirect(path);
+
+				String path = "/WEB-INF/Cancellazione";
+				ServletContext servletContext = getServletContext();
+				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+				templateEngine.process(path, ctx, response.getWriter());
 			} else {
 
 				ArrayList<UserBean> users;
@@ -130,12 +133,12 @@ public class CheckBoxUsers extends HttpServlet {
 
 				// Redirect to the Home page and add missions to the parameters
 				attempt++;
-				String path = "/WEB-INF/Anagrafica.html";
+				String path = "/WEB-INF/Anagrafica";
 				ServletContext servletContext = getServletContext();
 				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 				ctx.setVariable("users", users);
 				ctx.setVariable("attempt", 3 - attempt);
-
+				ctx.setVariable("surplusGuests",checkBoxArray.length - conference.getGuests());
 				templateEngine.process(path, ctx, response.getWriter());
 			}
 		}
