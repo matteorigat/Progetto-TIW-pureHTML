@@ -1,14 +1,13 @@
 
 body {
   color: white;
-  height: 100vh;
-  /* #9198e5 */
+  min-height: 100vh;
+  height: 100%;
   background: linear-gradient(-45deg, darkgreen, #1f1f1f 30%);
   font-family: Arial;
 }
 
 form {
-  position: sticky;
   top: 5px;
   width: 300px;
 }
@@ -41,8 +40,7 @@ button {
 }
 
 .rightside{
-  position: absolute;
-  left: 350px;
+  margin-left: 320px;
 }
 
 table{
