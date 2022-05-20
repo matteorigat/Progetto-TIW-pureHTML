@@ -3,7 +3,6 @@ package it.polimi.tiw.projects.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,15 +15,11 @@ import it.polimi.tiw.projects.beans.UserBean;
 import it.polimi.tiw.projects.dao.UserDAO;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection = null;
-    private TemplateEngine templateEngine;
 
     public RegisterServlet(){
         super();
@@ -32,23 +27,16 @@ public class RegisterServlet extends HttpServlet {
 
     public void init() throws ServletException {
         connection = ConnectionHandler.getConnection(getServletContext());
-        ServletContext servletContext = getServletContext();
-        ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        this.templateEngine = new TemplateEngine();
-        this.templateEngine.setTemplateResolver(templateResolver);
-        templateResolver.setSuffix(".html");
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //Copying all the input parameters in to local variables
+
         String name;
         String surname;
         String email;
         String username;
         String password;
         String password2;
-
         try {
             name = StringEscapeUtils.escapeJava(request.getParameter("name"));
             surname = StringEscapeUtils.escapeJava(request.getParameter("surname"));
@@ -65,10 +53,8 @@ public class RegisterServlet extends HttpServlet {
             if (name == null || surname == null || email == null || username == null || password == null || password2 == null || name.isEmpty() || surname.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty() || password2.isEmpty()){
                 throw new Exception("Missing or empty credential value");
             }
-
         } catch (Exception e) {
-            // for debugging only e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing credential value");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
             return;
         }
 
@@ -96,13 +82,12 @@ public class RegisterServlet extends HttpServlet {
         userBean.setUsername(username);
         userBean.setPassword(password);
 
-        //The core Logic of the Registration application is present here. We are going to insert user data in to the database.
         String userRegistered = userDao.registerUser(userBean);
 
-        if(userRegistered.equals("SUCCESS")){   //On success, you can display a message to user on Home page
+        if(userRegistered.equals("SUCCESS")){
             request.getRequestDispatcher("/index.html").forward(request, response);
         }
-        else   //On Failure, display a meaningful message to the User.
+        else
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error in creating an account");
         }
