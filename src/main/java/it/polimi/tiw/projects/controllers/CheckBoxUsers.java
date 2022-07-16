@@ -59,7 +59,7 @@ public class CheckBoxUsers extends HttpServlet {
 			return;
 		}
 
-		Conference conference = (Conference) request.getSession().getAttribute("conference");
+		Conference conference = (Conference) session.getAttribute("conference");
 		if (conference == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
 			return;
@@ -94,7 +94,7 @@ public class CheckBoxUsers extends HttpServlet {
 
 			// Redirect to the Home page
 			attempt = 0;
-			request.getSession().removeAttribute("conference");
+			session.removeAttribute("conference");
 			String path = getServletContext().getContextPath() + "/Home";
 			response.sendRedirect(path);
 
@@ -103,7 +103,7 @@ public class CheckBoxUsers extends HttpServlet {
 			if(attempt >= 2){
 				// Redirect to Cancellazione
 				attempt = 0;
-				request.getSession().removeAttribute("conference");
+				session.removeAttribute("conference");
 
 				String path = "/WEB-INF/Cancellazione";
 				ServletContext servletContext = getServletContext();
